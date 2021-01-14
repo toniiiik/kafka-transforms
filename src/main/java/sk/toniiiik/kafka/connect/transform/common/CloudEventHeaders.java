@@ -1,4 +1,4 @@
-package sk.prosoft.kafka.connect.transform.common;
+package sk.toniiiik.kafka.connect.transform.common;
 
 import java.util.Map;
 import java.util.UUID;
@@ -27,8 +27,8 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 		CloudEventHeadersConfig config = new CloudEventHeadersConfig(configs);
 		contentType = Values.parseString(config.contentType);
 		cloudEventSpecVersion = Values.parseString(config.cloudEventSpecVersion);
-		if (config.cloudEventSpecVersion != null) {
-			cloudEventSource = Values.parseString(config.cloudEventSpecVersion);
+		if (config.cloudEventSource != null) {
+			cloudEventSource = Values.parseString(config.cloudEventSource);
 		}
 	}
 

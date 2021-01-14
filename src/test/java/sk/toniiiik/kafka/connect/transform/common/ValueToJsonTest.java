@@ -1,5 +1,4 @@
-package sk.prosoft.kafka.connect.transform.common;
-
+package sk.toniiiik.kafka.connect.transform.common;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.kafka.connect.data.Schema;

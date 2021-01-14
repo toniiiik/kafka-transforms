@@ -1,4 +1,4 @@
-package sk.prosoft.kafka.connect.transform.common;
+package sk.toniiiik.kafka.connect.transform.common;
 
 import java.util.Map;
 
@@ -8,8 +8,8 @@ import org.apache.kafka.common.config.ConfigDef;
 public class CloudEventHeadersConfig extends AbstractConfig {
 
 	public static final String CONTENT_TYPE_CONFIG = "contenttype";
-	public static final String CE_SPECVERSION_CONFIG = "ce.specversion";
-	public static final String CE_SOURCE_CONFIG = "ce.source";
+	public static final String CE_SPECVERSION_CONFIG = "cespecversion";
+	public static final String CE_SOURCE_CONFIG = "cesource";
 
 	String contentType;
 	String cloudEventSpecVersion;
@@ -19,8 +19,8 @@ public class CloudEventHeadersConfig extends AbstractConfig {
 		super(config(), originals);
 
 		this.contentType = getString(CONTENT_TYPE_CONFIG);
-		this.cloudEventSpecVersion = getString(CONTENT_TYPE_CONFIG);
-		this.cloudEventSource = getString(CONTENT_TYPE_CONFIG);
+		this.cloudEventSpecVersion = getString(CE_SPECVERSION_CONFIG);
+		this.cloudEventSource = getString(CE_SOURCE_CONFIG);
 	}
 
 	public static ConfigDef config() {

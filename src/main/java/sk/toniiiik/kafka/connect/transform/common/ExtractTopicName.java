@@ -1,4 +1,4 @@
-package sk.prosoft.kafka.connect.transform.common;
+package sk.toniiiik.kafka.connect.transform.common;
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
