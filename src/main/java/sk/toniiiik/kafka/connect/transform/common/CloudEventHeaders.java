@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
+import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaAndValue;
 import org.apache.kafka.connect.data.Values;
 import org.apache.kafka.connect.header.ConnectHeaders;
@@ -26,7 +27,7 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 	public void configure(Map<String, ?> configs) {
 		CloudEventHeadersConfig config = new CloudEventHeadersConfig(configs);
 		contentType = Values.parseString(config.contentType);
-		cloudEventSpecVersion = Values.parseString(config.cloudEventSpecVersion);
+		cloudEventSpecVersion = new SchemaAndValue(Schema.STRING_SCHEMA,config.cloudEventSpecVersion);
 		if (config.cloudEventSource != null) {
 			cloudEventSource = Values.parseString(config.cloudEventSource);
 		}

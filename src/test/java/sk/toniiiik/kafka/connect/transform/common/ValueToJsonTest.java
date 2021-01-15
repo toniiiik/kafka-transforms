@@ -16,11 +16,56 @@ import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ValueToJsonTest {
-    private final ValueToJson<SinkRecord> xform = new ValueToJson.Value<>();
+    private final ValueToJson<SinkRecord> xform = new ValueToJson<>();
 
     @After
     public void teardown() {
         xform.close();
+    }
+
+    @Test
+    public void data() {
+        xform.configure(Collections.singletonMap("fields", ""));
+
+        String stringData = "{\n  \"before\" : null,\n  \"after\" : {\n    \"insuranceCategory\" : \"MANDATORY\",\n    \"lastUpdatedBy\" : \"lekar\",\n    \"providerCode\" : \"24\",\n    \"uuid\" : \"f66e02e1-d857-4a84-87d9-4b1d6fbe52c3\",\n    \"version\" : 0,\n    \"insuranceDocumentType\" : \"EPZP_SR\",\n    \"lastUpdated\" : \"2020-06-04T07:47:16.648076974Z\",\n    \"createdDate\" : \"2020-06-04T07:47:16.648076974Z\",\n    \"deleted\" : false,\n    \"identification\" : \"456789132\",\n    \"createdBy\" : \"lekar\",\n    \"tenantId\" : 9999,\n    \"id\" : 12244,\n    \"validity\" : {\n      \"start\" : \"2020-06-04T07:47:00Z\",\n      \"end\" : null\n    },\n    \"providerName\" : null\n  }\n}";
+
+        final HashMap<String, Object> value = new HashMap<>();
+
+        final SinkRecord record = new SinkRecord("", 0, null, null, null, stringData, 0);
+        final SinkRecord transformedRecord = xform.apply(record);
+
+        final HashMap<String, Integer> expectedKey = new HashMap<>();
+        expectedKey.put("a", 1);
+        expectedKey.put("b", 2);
+
+        assertNull(transformedRecord.valueSchema());
+        assertTrue(((Map<String, Object>)transformedRecord.value()).get("after") != null);
+    }
+
+    @Test
+    public void dataWithSchema() {
+        xform.configure(Collections.singletonMap("fields", ""));
+
+        String stringData = "{\n  \"before\" : null,\n  \"after\" : {\n    \"insuranceCategory\" : \"MANDATORY\",\n    \"lastUpdatedBy\" : \"lekar\",\n    \"providerCode\" : \"24\",\n    \"uuid\" : \"f66e02e1-d857-4a84-87d9-4b1d6fbe52c3\",\n    \"version\" : 0,\n    \"insuranceDocumentType\" : \"EPZP_SR\",\n    \"lastUpdated\" : \"2020-06-04T07:47:16.648076974Z\",\n    \"createdDate\" : \"2020-06-04T07:47:16.648076974Z\",\n    \"deleted\" : false,\n    \"identification\" : \"456789132\",\n    \"createdBy\" : \"lekar\",\n    \"tenantId\" : 9999,\n    \"id\" : 12244,\n    \"validity\" : {\n      \"start\" : \"2020-06-04T07:47:00Z\",\n      \"end\" : null\n    },\n    \"providerName\" : null\n  }\n}";
+        final Schema valueSchema = SchemaBuilder.string().build();
+
+//        Struct value = new Struct(valueSchema);
+//        value.
+
+        final HashMap<String, Object> value = new HashMap<>();
+
+        final SinkRecord record = new SinkRecord("", 0, null, null, valueSchema, stringData, 0);
+        final SinkRecord transformedRecord = xform.apply(record);
+
+        final HashMap<String, Integer> expectedKey = new HashMap<>();
+        expectedKey.put("a", 1);
+        expectedKey.put("b", 2);
+
+        org.apache.kafka.connect.json.JsonConverter jc = new org.apache.kafka.connect.json.JsonConverter();
+        jc.fromConnectData()
+
+//        assertNull(transformedRecord.valueSchema());
+        assertTrue(((Map<String, Object>)transformedRecord.value()).get("after") != null);
     }
 
     @Test
@@ -41,12 +86,12 @@ public class ValueToJsonTest {
         expectedKey.put("b", 2);
 
         assertNull(transformedRecord.valueSchema());
-        assertTrue(((Map<String, Object>)transformedRecord.value()).get("json") instanceof JsonNode);
+        assertTrue(((Map<String, Object>)transformedRecord.value()).get("json") instanceof Map);
     }
 
     @Test
     public void withSchema() {
-        xform.configure(Collections.singletonMap("fields", "a,b"));
+        xform.configure(Collections.singletonMap("fields", "json"));
 
         final Schema valueSchema = SchemaBuilder.struct()
                 .field("a", Schema.INT32_SCHEMA)
@@ -75,7 +120,7 @@ public class ValueToJsonTest {
 //        assertEquals(expectedKeySchema, transformedRecord.keySchema());
 //        assertEquals(expectedKey, transformedRecord.key());
 
-        assertTrue(((Map<String, Object>)transformedRecord.value()).get("json") instanceof JsonNode);
+        assertTrue(((Struct)transformedRecord.value()).get("json") instanceof Map);
     }
 
 }
