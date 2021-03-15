@@ -3,6 +3,7 @@ package sk.toniiiik.kafka.connect.transform.common;
 import java.util.Map;
 import java.util.UUID;
 
+import jdk.internal.joptsimple.internal.Strings;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.data.Schema;
@@ -18,10 +19,12 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 	public static final String CE_ID_HEADER_NAME = "ce_id";
 	public static final String CE_SPECVERSION_HEADER_NAME = "ce_specversion";
 	public static final String CE_SOURCE_HEADER_NAME = "ce_source";
+	public static final String CE_TYPE_HEADER_NAME = "ce_type";
 
 	private SchemaAndValue contentType;
 	private SchemaAndValue cloudEventSpecVersion;
 	private SchemaAndValue cloudEventSource;
+	private SchemaAndValue cloudEvenType;
 
 	@Override
 	public void configure(Map<String, ?> configs) {
@@ -30,6 +33,9 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 		cloudEventSpecVersion = new SchemaAndValue(Schema.STRING_SCHEMA,config.cloudEventSpecVersion);
 		if (config.cloudEventSource != null) {
 			cloudEventSource = Values.parseString(config.cloudEventSource);
+		}
+		if(config.cloudEventsType != null) {
+			cloudEvenType = Values.parseString(config.cloudEventsType);
 		}
 	}
 
@@ -45,6 +51,9 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 		addHeaderIfNotPresent(newHeaders, CE_ID_HEADER_NAME, Values.parseString(UUID.randomUUID().toString()));
 		addHeaderIfNotPresent(newHeaders, CE_SPECVERSION_HEADER_NAME, cloudEventSpecVersion);
 		addHeaderIfNotPresent(newHeaders, CE_SOURCE_HEADER_NAME, cloudEventSource);
+		if(cloudEvenType != null && !cloudEvenType.value().equals(Strings.EMPTY)){
+			addHeaderIfNotPresent(newHeaders, CE_TYPE_HEADER_NAME, cloudEvenType);
+		}
 		return record.newRecord(record.topic(), record.kafkaPartition(), record.keySchema(), record.key(), record.valueSchema(), record.value(),
 				record.timestamp(), newHeaders);
 	}

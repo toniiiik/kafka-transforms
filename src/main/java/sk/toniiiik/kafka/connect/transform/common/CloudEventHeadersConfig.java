@@ -10,10 +10,12 @@ public class CloudEventHeadersConfig extends AbstractConfig {
 	public static final String CONTENT_TYPE_CONFIG = "contenttype";
 	public static final String CE_SPECVERSION_CONFIG = "cespecversion";
 	public static final String CE_SOURCE_CONFIG = "cesource";
+	public static final String CE_TYPE_CONFIG = "cetype";
 
 	String contentType;
 	String cloudEventSpecVersion;
 	String cloudEventSource;
+	String cloudEventsType;
 
 	public CloudEventHeadersConfig(Map<?, ?> originals) {
 		super(config(), originals);
@@ -21,6 +23,7 @@ public class CloudEventHeadersConfig extends AbstractConfig {
 		this.contentType = getString(CONTENT_TYPE_CONFIG);
 		this.cloudEventSpecVersion = getString(CE_SPECVERSION_CONFIG);
 		this.cloudEventSource = getString(CE_SOURCE_CONFIG);
+		this.cloudEventsType = getString(CE_TYPE_CONFIG);
 	}
 
 	public static ConfigDef config() {
@@ -29,7 +32,9 @@ public class CloudEventHeadersConfig extends AbstractConfig {
 						"Content type of the cloud event value (default 'application/cloudevents+json')")
 				.define(CE_SPECVERSION_CONFIG, ConfigDef.Type.STRING, "1.0", ConfigDef.Importance.HIGH,
 						"Specification version of the cloud event value (default '1.0')")
-				.define(CE_SOURCE_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.LOW, "Source of the cloud event");
+				.define(CE_SOURCE_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.LOW, "Source of the cloud event")
+				.define(CE_TYPE_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.HIGH,
+						"Type of the message, if null or empty string is presented header will be omitted.");
 	}
 
 	@Override
@@ -39,7 +44,8 @@ public class CloudEventHeadersConfig extends AbstractConfig {
 		result = prime * result + ((cloudEventSource == null) ? 0 : cloudEventSource.hashCode());
 		result = prime * result + ((cloudEventSpecVersion == null) ? 0 : cloudEventSpecVersion.hashCode());
 		result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
-		return result;
+		result = prime * result + ((cloudEventsType == null) ? 0 : cloudEventsType.hashCode());
+ 		return result;
 	}
 
 	@Override
@@ -70,6 +76,13 @@ public class CloudEventHeadersConfig extends AbstractConfig {
 				return false;
 			}
 		} else if (!contentType.equals(other.contentType)) {
+			return false;
+		}
+		if(cloudEventsType == null) {
+			if(other.cloudEventsType != null) {
+				return false;
+			}
+		} else if (!cloudEventsType.equals(other.cloudEventsType)){
 			return false;
 		}
 		return true;

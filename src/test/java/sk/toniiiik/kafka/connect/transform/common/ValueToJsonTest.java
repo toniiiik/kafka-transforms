@@ -62,7 +62,7 @@ public class ValueToJsonTest {
         expectedKey.put("b", 2);
 
         org.apache.kafka.connect.json.JsonConverter jc = new org.apache.kafka.connect.json.JsonConverter();
-        jc.fromConnectData()
+//        jc.fromConnectData();
 
 //        assertNull(transformedRecord.valueSchema());
         assertTrue(((Map<String, Object>)transformedRecord.value()).get("after") != null);
