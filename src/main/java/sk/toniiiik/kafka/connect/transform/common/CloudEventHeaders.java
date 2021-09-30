@@ -1,9 +1,6 @@
 package sk.toniiiik.kafka.connect.transform.common;
 
-import java.util.Map;
-import java.util.UUID;
-
-import jdk.internal.joptsimple.internal.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.data.Schema;
@@ -12,6 +9,10 @@ import org.apache.kafka.connect.data.Values;
 import org.apache.kafka.connect.header.ConnectHeaders;
 import org.apache.kafka.connect.header.Headers;
 import org.apache.kafka.connect.transforms.Transformation;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transformation<R> {
 
@@ -26,6 +27,8 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 	private SchemaAndValue cloudEventSource;
 	private SchemaAndValue cloudEvenType;
 
+	private List additionalPlacements = null;
+
 	@Override
 	public void configure(Map<String, ?> configs) {
 		CloudEventHeadersConfig config = new CloudEventHeadersConfig(configs);
@@ -37,6 +40,7 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 		if(config.cloudEventsType != null) {
 			cloudEvenType = Values.parseString(config.cloudEventsType);
 		}
+		this.additionalPlacements = config.additionalPlacements;
 	}
 
 	@Override
@@ -51,11 +55,28 @@ public class CloudEventHeaders<R extends ConnectRecord<R>> implements Transforma
 		addHeaderIfNotPresent(newHeaders, CE_ID_HEADER_NAME, Values.parseString(UUID.randomUUID().toString()));
 		addHeaderIfNotPresent(newHeaders, CE_SPECVERSION_HEADER_NAME, cloudEventSpecVersion);
 		addHeaderIfNotPresent(newHeaders, CE_SOURCE_HEADER_NAME, cloudEventSource);
-		if(cloudEvenType != null && !cloudEvenType.value().equals(Strings.EMPTY)){
+		if(cloudEvenType != null && !cloudEvenType.value().equals(StringUtils.EMPTY)){
 			addHeaderIfNotPresent(newHeaders, CE_TYPE_HEADER_NAME, cloudEvenType);
 		}
+
+		processAdditionalPlacements(record, newHeaders);
+
 		return record.newRecord(record.topic(), record.kafkaPartition(), record.keySchema(), record.key(), record.valueSchema(), record.value(),
 				record.timestamp(), newHeaders);
+	}
+
+	private void processAdditionalPlacements(R record, Headers newHeaders) {
+		if( this.additionalPlacements == null){
+			return;
+		}
+
+		for (Object p :
+				this.additionalPlacements) {
+			String[] parts = ((String)p).split(":");
+			CloudEventHeadersConfig.Placement placement = CloudEventHeadersConfig.Placement.fromParts(parts);
+			addHeaderIfNotPresent(newHeaders, placement.alias, placement.asSchemaAndValue());
+		}
+
 	}
 
 	private void addHeaderIfNotPresent(Headers newHeaders, String key, SchemaAndValue value) {
