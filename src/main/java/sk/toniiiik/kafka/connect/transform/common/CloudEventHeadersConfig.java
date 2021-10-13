@@ -31,6 +31,7 @@ public class CloudEventHeadersConfig extends AbstractConfig {
 		this.contentType = getString(CONTENT_TYPE_CONFIG);
 		this.cloudEventSpecVersion = getString(CE_SPECVERSION_CONFIG);
 		this.cloudEventSource = getString(CE_SOURCE_CONFIG);
+		this.cloudEventsType = getString(CE_TYPE_CONFIG);
 		this.additionalPlacements = getList(CE_ADDITIONAL_PLACEMENT);
 	}
 	public static enum PlacementType {

@@ -43,7 +43,17 @@ public class CloudEventHeadersTest {
         final SinkRecord cloudEvent = xform.apply(record);
 
         assertTrue(StreamSupport.stream(cloudEvent.headers().spliterator(), true).anyMatch(h->h.key().equals("ce_tenantid")));
+        assertTrue(StreamSupport.stream(cloudEvent.headers().spliterator(), true).anyMatch(h->h.key().equals("ce_type")));
+    }
 
+    @Test
+    public void ceTypeIsDefined_OK(){
+        xform.configure(Collections.singletonMap(CloudEventHeadersConfig.CE_TYPE_CONFIG, "ObservationCreated"));
+
+        final SinkRecord record = new SinkRecord("", 0, null, null, null, getData(), 0);
+        final SinkRecord cloudEvent = xform.apply(record);
+
+        assertTrue(StreamSupport.stream(cloudEvent.headers().spliterator(), true).anyMatch(h->h.key().equals("ce_type")));
     }
 
     @Test
