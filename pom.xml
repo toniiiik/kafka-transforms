@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kafka-connect-transform-common</artifactId>
     <groupId>sk.prosoft.kafka.connect</groupId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
     <name>kafka-connect-transform-common</name>
 
     <properties>
